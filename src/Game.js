@@ -3,25 +3,20 @@ import Board from "./Component/Board";
 import { useState } from "react";
 
 function Game() {
+  const boardInit = [];
+  for (let i = 0; i < 3; i++) {
+    const boardRow = [];
+    for (let j = 0; j < 3; j++) {
+      boardRow.push({ value: null, isHighLight: false });
+    }
+    boardInit.push(boardRow);
+  }
   const [history, setHistory] = useState([
     {
-      board:
-        [
-          [{ value: null, isHighLight: false }, { value: null, isHighLight: false }, {
-            value: null,
-            isHighLight: false
-          }],
-          [{ value: null, isHighLight: false }, { value: null, isHighLight: false }, {
-            value: null,
-            isHighLight: false
-          }],
-          [{ value: null, isHighLight: false }, { value: null, isHighLight: false }, {
-            value: null,
-            isHighLight: false
-          }]
-        ],
+      board: boardInit,
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      lastPosition: { row: null, col: null }
     }
   ]);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -65,7 +60,8 @@ function Game() {
     const newStep = {
       board: currentBoard,
       stepNumber: current.stepNumber + 1,
-      xIsNext: !current.xIsNext
+      xIsNext: !current.xIsNext,
+      lastPosition: { row: r, col: c }
     };
 
     const winner = calculateWinter(newStep.board);
@@ -103,7 +99,7 @@ function Game() {
     const sortedHistory = isDescending ? history.slice().reverse() : history;
     return sortedHistory.map((step) => {
       const desc = step.stepNumber ?
-        "Go to move #" + step.stepNumber :
+        (`Go to move #${step.stepNumber} ${step.xIsNext ? "O" : "X"}(${step.lastPosition.col + 1},${step.lastPosition.row + 1})`) :
         "Go to game start";
       return (
         <li key={step.stepNumber}>
